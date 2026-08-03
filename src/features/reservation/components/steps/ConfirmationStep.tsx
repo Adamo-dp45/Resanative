@@ -7,6 +7,7 @@ import { Button } from '@/core/ui/Button';
 import { Card } from '@/core/ui/Card';
 import { Text } from '@/core/ui/Text';
 
+import { heureEmbarquement } from '../../api/types';
 import { useBookingStore } from '../../store/bookingStore';
 import { DownloadVoucherButton } from '../DownloadVoucherButton';
 import { StatusBadge } from '../StatusBadge';
@@ -57,10 +58,27 @@ export function ConfirmationStep() {
           <StatusBadge reservation={reservation} />
         </View>
         <Line label="Trajet" value={`${reservation.montee ?? '—'} → ${reservation.descente ?? '—'}`} />
-        <Line label="Départ" value={formatDateTime(reservation.datedepartprevue)} />
+        <Line label="Départ" value={formatDateTime(heureEmbarquement(reservation))} />
         <Line label="Montant" value={formatMoney(reservation.montant)} />
         <Line label="Passager" value={reservation.nomclient ?? '—'} />
+        {/*
+          L'échéance a changé de NATURE au paiement : elle ne borne plus le PAIEMENT mais la
+          PRÉSENTATION au guichet. C'est désormais la consigne la plus utile au client — sans elle,
+          il ignore jusqu'à quand son bon lui garantit sa place.
+        */}
+        {reservation.dateexpiration ? (
+          <Line label="À retirer avant" value={formatDateTime(reservation.dateexpiration)} />
+        ) : null}
       </Card>
+
+      {reservation.dateexpiration ? (
+        <Card background={colors.surfaceAlt}>
+          <Text tone="muted">
+            ⏰ Retirez votre billet en gare avant cette heure. Passé ce délai, votre place n&apos;est
+            plus tenue : elle reste récupérable en gare, mais avec des frais.
+          </Text>
+        </Card>
+      ) : null}
 
       <DownloadVoucherButton reservation={reservation} />
       <Button label="Terminer" icon="🏠" onPress={finish} />

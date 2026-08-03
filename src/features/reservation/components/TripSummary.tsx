@@ -5,6 +5,7 @@ import { spacing, useTheme } from '@/core/theme/theme';
 import { Card } from '@/core/ui/Card';
 import { Text } from '@/core/ui/Text';
 
+import { heureEmbarquement } from '../api/types';
 import { selectedMontant, useBookingStore } from '../store/bookingStore';
 
 /** Récapitulatif du trajet en cours de réservation (trajet, départ, montant). */
@@ -21,7 +22,7 @@ export function TripSummary() {
         {gareDepart?.libelle ?? '—'} → {destination?.gare.libelle ?? '—'}
       </Text>
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
-      <Row label="🕒" value={formatDateTime(depart?.datedepartprevue)} />
+      <Row label="🕒" value={formatDateTime(heureEmbarquement(depart))} />
       <Row label="💳" value={formatMoney(montant)} emphasize />
     </Card>
   );

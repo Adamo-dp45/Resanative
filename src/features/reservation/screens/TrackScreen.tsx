@@ -49,7 +49,9 @@ export function TrackScreen() {
       {query ? (
         <View style={styles.result}>
           <QueryBoundary query={suivi}>
-            {(reservation) => <ReservationDetails reservation={reservation} />}
+            {(reservation) => (
+              <ReservationDetails reservation={reservation} showTracking />
+            )}
           </QueryBoundary>
         </View>
       ) : null}

@@ -3,7 +3,7 @@ import * as Sharing from 'expo-sharing';
 
 import { formatDateTime, formatMoney } from '@/core/format/formatters';
 
-import { isPaid, type Compagnie, type Reservation } from '../api/types';
+import { heureEmbarquement, isPaid, type Compagnie, type Reservation } from '../api/types';
 
 /** Échappe le texte dynamique inséré dans le HTML du bon. */
 function escapeHtml(value: string | null | undefined): string {
@@ -74,7 +74,7 @@ function buildVoucherHtml(
     <tr><td class="k">Passager</td><td class="v">${escapeHtml(reservation.nomclient)}</td></tr>
     <tr><td class="k">Téléphone</td><td class="v">${escapeHtml(reservation.contactclient)}</td></tr>
     <tr><td class="k">Voyage</td><td class="v">${escapeHtml(reservation.codevoyage)}</td></tr>
-    <tr><td class="k">Départ prévu</td><td class="v">${formatDateTime(reservation.datedepartprevue)}</td></tr>
+    <tr><td class="k">Départ prévu</td><td class="v">${formatDateTime(heureEmbarquement(reservation))}</td></tr>
     <tr><td class="k">Montant</td><td class="v">${formatMoney(reservation.montant)}</td></tr>
   </table>
 

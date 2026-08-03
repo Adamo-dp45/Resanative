@@ -10,6 +10,8 @@ export interface Compagnie {
   sigle?: string | null;
   contact?: string | null;
   siteweb?: string | null;
+  /** Minutes pendant lesquelles une réservation non payée tient sa place (réglé par la compagnie). */
+  delaiPaiementMinutes?: number | null;
 }
 
 export interface Ville {
@@ -31,6 +33,13 @@ export interface Destination {
 export interface Depart {
   voyageId: number;
   codevoyage?: string | null;
+  /*
+    Heure de passage du car À LA GARE DE MONTÉE demandée : c'est CELLE-CI qu'on affiche au client.
+    'datedepartprevue' est le départ du voyage depuis SON origine — sur Abidjan → Bouaké → Korhogo,
+    qui réserve au départ de Bouaké n'a que faire de l'heure à laquelle le car quitte Abidjan.
+    Calculée par l'API (durées de trajet par arrêt), jamais ici.
+  */
+  heurepassage?: string | null;
   datedepartprevue?: string | null;
   datearriveeprevue?: string | null;
   placesDisponibles: number;
@@ -54,9 +63,20 @@ export interface Reservation {
   montee?: string | null;
   descente?: string | null;
   codevoyage?: string | null;
+  /** Heure de passage du car à VOTRE gare de montée — l'heure à laquelle il faut être là. */
+  heurepassage?: string | null;
   datedepartprevue?: string | null;
   bonDisponible: boolean;
   billetEmis?: string | null;
+  // -- Suivi temps réel « où est mon car » -- //
+  /** Le car a-t-il quitté son origine (départ réel horodaté) ? */
+  voyageDemarre?: boolean;
+  /** Gare où se trouve actuellement le car ; absent tant qu'il n'est pas parti. */
+  positionActuelle?: string | null;
+  /** Retard courant du car en minutes (positif = retard, négatif = avance) ; absent si non mesuré. */
+  retardMinutes?: number | null;
+  /** Heure de passage ESTIMÉE chez le client = heure prévue + retard courant. */
+  heurepassageEstimee?: string | null;
   paiement?: PaiementInfo | null;
 }
 
@@ -83,6 +103,59 @@ export function isPaid(reservation: Reservation): boolean {
   return reservation.etatpaiement === 'PAYE';
 }
 
+/*
+  Heure à laquelle le client doit être à SA gare. C'est toujours celle-ci qu'on affiche : le départ
+  du voyage depuis son origine ne le concerne pas s'il monte en cours de route. Repli sur ce départ
+  tant que l'API ne renvoie pas d'heure de passage (ligne dont les durées d'arrêt ne sont pas encore
+  renseignées) — l'ancien affichage, jamais une heure inventée ici.
+*/
+export function heureEmbarquement(
+  x: { heurepassage?: string | null; datedepartprevue?: string | null } | null | undefined
+): string | null | undefined {
+  return x?.heurepassage ?? x?.datedepartprevue;
+}
+
+/*
+  Une échéance ne s'affiche QUE tant qu'elle est encore à respecter, ce que dit le statut — pas
+  'etatpaiement'. Une réservation à régulariser est payée elle aussi : se fier au paiement lui
+  faisait afficher « À retirer avant » avec une heure déjà passée. Passé le statut vivant,
+  'dateexpiration' n'est plus une consigne mais la trace de l'échéance manquée.
+*/
+export function isAwaitingPayment(reservation: Reservation): boolean {
+  return reservation.statut === 'EN_ATTENTE';
+}
+
+export function isConfirmed(reservation: Reservation): boolean {
+  return reservation.statut === 'CONFIRMEE';
+}
+
+export function needsRegularisation(reservation: Reservation): boolean {
+  return reservation.statut === 'A_REGULARISER';
+}
+
 export function isSimulatedPayment(reservation: Reservation): boolean {
   return reservation.paiement?.estSimule ?? false;
+}
+
+// -- Suivi temps réel (dérivés) -- //
+
+/** Le suivi « où est mon car » n'a de sens qu'une fois le car parti. */
+export function suiviDisponible(reservation: Reservation): boolean {
+  return reservation.voyageDemarre === true;
+}
+
+/** Le car est-il en retard (au-delà d'une minute) ? Pilote la couleur d'alerte. */
+export function estEnRetard(reservation: Reservation): boolean {
+  return (reservation.retardMinutes ?? 0) > 0;
+}
+
+/**
+ * Libellé lisible du retard courant, ou null si non mesuré.
+ * Ex. `À l'heure`, `15 min de retard`, `10 min d'avance`.
+ */
+export function retardLabel(reservation: Reservation): string | null {
+  const r = reservation.retardMinutes;
+  if (r == null) return null;
+  if (r === 0) return "À l'heure";
+  return r > 0 ? `${r} min de retard` : `${-r} min d'avance`;
 }
