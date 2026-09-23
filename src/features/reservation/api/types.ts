@@ -33,6 +33,11 @@ export interface Destination {
 export interface Depart {
   voyageId: number;
   codevoyage?: string | null;
+  /**
+   * Numéro de départ DU JOUR (« Départ 2 ») : le repère que la gare annonce à l'embarquement et
+   * que portera le billet. Attribué par le serveur.
+   */
+  numerodepart?: number | null;
   /*
     Heure de passage du car À LA GARE DE MONTÉE demandée : c'est CELLE-CI qu'on affiche au client.
     'datedepartprevue' est le départ du voyage depuis SON origine — sur Abidjan → Bouaké → Korhogo,
@@ -63,6 +68,11 @@ export interface Reservation {
   montee?: string | null;
   descente?: string | null;
   codevoyage?: string | null;
+  /**
+   * Numéro de départ DU JOUR (« Départ 2 ») : le repère que la gare annonce à l'embarquement et
+   * que portera le billet. Attribué par le serveur.
+   */
+  numerodepart?: number | null;
   /** Heure de passage du car à VOTRE gare de montée — l'heure à laquelle il faut être là. */
   heurepassage?: string | null;
   datedepartprevue?: string | null;
@@ -109,6 +119,20 @@ export function isPaid(reservation: Reservation): boolean {
   tant que l'API ne renvoie pas d'heure de passage (ligne dont les durées d'arrêt ne sont pas encore
   renseignées) — l'ancien affichage, jamais une heure inventée ici.
 */
+/*
+  Comment on NOMME un départ au client : « Départ 2 ».
+
+  Le code voyage est du vocabulaire d'exploitation, il ne lui dit rien ; le numéro, lui, est ce que
+  la gare annoncera à l'embarquement. Repli sur le code tant qu'une API ne sert pas le numéro,
+  plutôt que d'afficher « Départ null ».
+*/
+export function libelleDepart(
+  x: { numerodepart?: number | null; codevoyage?: string | null } | null | undefined
+): string {
+  if (x?.numerodepart != null) return `Départ ${x.numerodepart}`;
+  return x?.codevoyage ?? '';
+}
+
 export function heureEmbarquement(
   x: { heurepassage?: string | null; datedepartprevue?: string | null } | null | undefined
 ): string | null | undefined {

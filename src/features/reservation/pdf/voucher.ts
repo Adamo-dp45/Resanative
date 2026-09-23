@@ -74,6 +74,8 @@ function buildVoucherHtml(
     <tr><td class="k">Passager</td><td class="v">${escapeHtml(reservation.nomclient)}</td></tr>
     <tr><td class="k">Téléphone</td><td class="v">${escapeHtml(reservation.contactclient)}</td></tr>
     <tr><td class="k">Voyage</td><td class="v">${escapeHtml(reservation.codevoyage)}</td></tr>
+    <!-- Le client présentera ce bon au guichet : le numéro de départ est ce qu'on lui appellera. -->
+    <tr><td class="k">N° de départ</td><td class="v">${reservation.numerodepart ?? '—'}</td></tr>
     <tr><td class="k">Départ prévu</td><td class="v">${formatDateTime(heureEmbarquement(reservation))}</td></tr>
     <tr><td class="k">Montant</td><td class="v">${formatMoney(reservation.montant)}</td></tr>
   </table>

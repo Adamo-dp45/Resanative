@@ -4,7 +4,7 @@ import { formatDateTime, formatMoney } from '@/core/format/formatters';
 import { radius, spacing, useTheme } from '@/core/theme/theme';
 import { Text } from '@/core/ui/Text';
 
-import { heureEmbarquement, type Depart } from '../api/types';
+import { heureEmbarquement, libelleDepart, type Depart } from '../api/types';
 
 interface DepartCardProps {
   depart: Depart;
@@ -36,7 +36,7 @@ export function DepartCard({ depart, selected, onPress }: DepartCardProps) {
           {formatDateTime(heureEmbarquement(depart))}
         </Text>
         <Text variant="caption" tone="muted">
-          {depart.placesDisponibles} place(s) · {depart.codevoyage ?? ''}
+          {depart.placesDisponibles} place(s) · {libelleDepart(depart)}
         </Text>
       </View>
       <Text variant="subtitle" bold tone="primary">
