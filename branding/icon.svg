@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>iTransport Réservation — la place retenue</title>
+  <rect id="fond" width="512" height="512" fill="#F59E0B"/>
+  <g id="dessin">
+    <rect x="168" y="96" width="176" height="200" rx="56" fill="#FFFFFF"/>
+    <rect x="132" y="280" width="248" height="76" rx="38" fill="#FFFFFF"/>
+    <rect x="160" y="348" width="40" height="68" rx="20" fill="#FFFFFF"/>
+    <rect x="312" y="348" width="40" height="68" rx="20" fill="#FFFFFF"/>
+    <path d="M214 190 l30 32 l64 -70" fill="none" stroke="#78350F" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
